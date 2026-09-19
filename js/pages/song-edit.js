@@ -3,6 +3,7 @@ import { getSong, saveSong, newBlock, textToLyricLines } from '../songs.js';
 import { saveImage, getImageUrl, deleteImage, listImagesByKind } from '../images.js';
 import { recognizeImage } from '../ocr.js';
 import { renderChordEditor } from '../chord-editor.js';
+import { containsChordLine, parseChordSheetText } from '../chord-text-parser.js';
 
 renderHeader(null);
 
@@ -120,7 +121,8 @@ function renderBlocks() {
 
       <div class="field">
         <label>歌詞テキスト（1行ずつ改行）</label>
-        <textarea data-role="lyric-text" rows="4">${escapeHtml(block.lyricLines.join('\n'))}</textarea>
+        <p class="hint">コード譜サイト等のテキストをそのまま貼り付けてもOKです。「Am7　　C」のようなコードだけの行を歌詞の上に置くと、反映時に自動でコードの位置まで配置されます（OCRより正確です）。</p>
+        <textarea data-role="lyric-text" rows="4" placeholder="Am7      C&#10;やさしい光が&#10;F      G/B&#10;夜に　二人で歩いた道">${escapeHtml(block.lyricLines.join('\n'))}</textarea>
         <div class="row" style="margin-top:6px;">
           <button data-action="apply-lyrics">歌詞をプレビューに反映</button>
         </div>
@@ -143,7 +145,16 @@ function renderBlocks() {
 
     panel.querySelector('[data-action="apply-lyrics"]').addEventListener('click', () => {
       const text = panel.querySelector('[data-role="lyric-text"]').value;
-      block.lyricLines = textToLyricLines(text);
+      if (containsChordLine(text)) {
+        // コード行（例: "Am7  C"）が含まれる場合は、コード譜テキストとして
+        // 自動的にコードの行・位置を解析して反映する（OCRを介さず正確に取り込める）
+        const parsed = parseChordSheetText(text);
+        block.lyricLines = parsed.lyricLines;
+        block.chords = parsed.chords;
+      } else {
+        block.lyricLines = textToLyricLines(text);
+        // コード行がない場合は歌詞のみの更新とみなし、既存のコード配置は保持する
+      }
       renderChordEditor(chordEditorEl, block, () => scheduleSave());
       scheduleSave();
     });
