@@ -1,6 +1,8 @@
 // OCR機能。本番中は使わないため、あえてvendor同梱せず「OCR実行」ボタン押下時にのみ
 // CDN(jsDelivr)からTesseract.jsを動的読み込みする（配布サイズ削減のため）。
 // 画像データ自体は外部送信されない（Tesseract.jsはブラウザ内(WASM)でOCR処理を行う）。
+import { isPdfFile, renderPdfFirstPageToBlob } from './pdf-render.js';
+
 const TESSERACT_CDN_URL = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
 
 let loadPromise = null;
@@ -62,9 +64,16 @@ async function preprocessImage(fileOrBlob) {
 
 export async function recognizeImage(fileOrBlob, onProgress) {
   await loadTesseractScript();
-  let target = fileOrBlob;
+
+  let source = fileOrBlob;
+  if (isPdfFile(fileOrBlob)) {
+    if (onProgress) onProgress('PDFを画像に変換中', 0);
+    source = await renderPdfFirstPageToBlob(fileOrBlob);
+  }
+
+  let target = source;
   try {
-    target = await preprocessImage(fileOrBlob);
+    target = await preprocessImage(source);
   } catch (e) {
     // 前処理に失敗しても元画像でOCRを継続する
   }

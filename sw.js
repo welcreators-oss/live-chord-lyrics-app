@@ -1,6 +1,6 @@
 // オフラインキャッシュ用Service Worker。
 // 更新時はCACHE_NAMEのバージョンを上げること（古いキャッシュは自動破棄される）。
-const CACHE_NAME = 'live-chord-cache-v1';
+const CACHE_NAME = 'live-chord-cache-v2';
 
 const PRECACHE_URLS = [
   './',
@@ -13,6 +13,7 @@ const PRECACHE_URLS = [
   './js/images.js',
   './js/songs.js',
   './js/ocr.js',
+  './js/pdf-render.js',
   './js/pedal.js',
   './js/chord-editor.js',
   './js/chord-display.js',

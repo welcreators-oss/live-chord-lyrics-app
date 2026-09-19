@@ -110,11 +110,12 @@ function renderBlocks() {
       </div>
 
       <div class="field">
-        <label>コード譜の写真からOCR取り込み</label>
+        <label>コード譜の写真またはPDFからOCR取り込み</label>
         <div class="row">
-          <input type="file" accept="image/*" data-role="ocr-file">
+          <input type="file" accept="image/*,.pdf,application/pdf" data-role="ocr-file">
           <span class="hint" data-role="ocr-status"></span>
         </div>
+        <p class="hint">PDFは1ページ目のみ読み込みます。</p>
       </div>
 
       <div class="field">
