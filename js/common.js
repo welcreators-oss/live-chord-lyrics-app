@@ -40,9 +40,27 @@ function resolveRootPath(path) {
   return inPages ? `../${path}` : path;
 }
 
+// 新しいバージョンを公開したのに、開きっぱなしのタブが古いキャッシュのまま動き続けて
+// 「更新したのに反映されない」状態にならないよう、新しいService Workerが有効化された
+// 瞬間に自動でページを再読み込みする。ただし本番モード（stage.html）だけは演奏中に
+// 勝手にリロードされると困るため、disableAutoReloadOnUpdate()で個別に無効化できる。
+let autoReloadOnUpdate = true;
+export function disableAutoReloadOnUpdate() {
+  autoReloadOnUpdate = false;
+}
+
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register(resolveRootPath('sw.js')).catch(() => {});
+    navigator.serviceWorker.register(resolveRootPath('sw.js')).then((reg) => {
+      reg.update().catch(() => {});
+    }).catch(() => {});
+  });
+
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (reloaded || !autoReloadOnUpdate) return;
+    reloaded = true;
+    location.reload();
   });
 }
 

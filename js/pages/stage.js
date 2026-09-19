@@ -4,7 +4,19 @@ import { getAll } from '../db.js';
 import { getImageUrl, listImagesByKind } from '../images.js';
 import { attachPedalListener } from '../pedal.js';
 import { renderStageBlock } from '../chord-display.js';
-import { escapeHtml } from '../common.js';
+import { escapeHtml, disableAutoReloadOnUpdate } from '../common.js';
+
+// 演奏中に新バージョンへ自動更新されて画面が途切れると困るため、本番モードだけは
+// 自動リロードを止め、代わりに控えめな通知だけ出す（更新は曲間に手動で）。
+disableAutoReloadOnUpdate();
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    const note = document.createElement('div');
+    note.textContent = '新しいバージョンがあります（曲間に画面を開き直してください）';
+    note.style.cssText = 'position:fixed;bottom:8px;right:8px;z-index:99;background:rgba(0,0,0,0.7);color:#ffd54a;font-size:11px;padding:6px 10px;border-radius:6px;';
+    document.body.appendChild(note);
+  });
+}
 
 const els = {
   empty: document.getElementById('stage-empty'),
