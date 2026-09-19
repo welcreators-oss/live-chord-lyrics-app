@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>バックアップ - ライブコード歌詞アプリ</title>
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<main>
+  <div class="panel">
+    <h3 style="margin-top:0;">バックアップ（エクスポート）</h3>
+    <p class="hint">曲・画像・セットリスト・設定をすべて1つのzipファイルにまとめて書き出します。本番前の保険や、別端末への移行に使えます。</p>
+    <button class="primary" id="btn-export">バックアップを書き出す</button>
+    <span class="hint" id="export-status"></span>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0;">復元（インポート）</h3>
+    <p class="hint">書き出したzipファイルから復元します。<strong>現在のデータはすべて置き換えられます。</strong></p>
+    <input type="file" id="import-file" accept=".zip">
+    <div class="row" style="margin-top:10px;">
+      <button class="danger" id="btn-import">このファイルで復元する</button>
+      <span class="hint" id="import-status"></span>
+    </div>
+  </div>
+</main>
+<script src="../vendor/jszip.min.js"></script>
+<script type="module" src="../js/pages/backup.js"></script>
+</body>
+</html>

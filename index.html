@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>曲一覧 - ライブコード歌詞アプリ</title>
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="css/style.css">
+<link rel="manifest" href="manifest.json">
+</head>
+<body>
+<main>
+  <div class="panel">
+    <div class="row" style="justify-content: space-between;">
+      <div>
+        <label>新しい曲を追加</label>
+        <div class="row">
+          <input type="text" id="new-song-title" placeholder="曲名を入力" style="width:240px;">
+          <button class="primary" id="btn-add-song">追加</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="song-list"></div>
+</main>
+<script type="module" src="js/pages/index.js"></script>
+</body>
+</html>

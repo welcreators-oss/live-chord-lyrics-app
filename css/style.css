@@ -1,0 +1,204 @@
+:root {
+  color-scheme: light;
+  --bg: #f5f5f3;
+  --panel: #ffffff;
+  --border: #ddd8d0;
+  --text: #222;
+  --text-muted: #777;
+  --accent: #c0392b;
+  --accent-hover: #a93226;
+  --chip-bg: #fff3cd;
+  --chip-border: #e0b93a;
+  --danger: #c0392b;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+header.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header.app-header h1 {
+  font-size: 16px;
+  margin: 0;
+}
+
+nav.app-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+nav.app-nav a {
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--text);
+  font-size: 13px;
+}
+
+nav.app-nav a.active,
+nav.app-nav a:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+main {
+  padding: 16px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+
+button, .btn {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+}
+
+button.primary, .btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+button.primary:hover, .btn.primary:hover { background: var(--accent-hover); }
+
+button.danger { color: var(--danger); border-color: var(--danger); }
+button.danger:hover { background: var(--danger); color: #fff; }
+
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+input[type="text"], input[type="number"], textarea, select {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 100%;
+  background: #fff;
+  color: var(--text);
+}
+
+textarea { resize: vertical; }
+
+label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; }
+
+.field { margin-bottom: 12px; }
+
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  background: #fff;
+}
+
+.list-item .title { font-weight: bold; }
+.list-item .meta { font-size: 12px; color: var(--text-muted); }
+
+.thumb-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.thumb {
+  position: relative;
+  width: 100px;
+  height: 70px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 2px solid var(--border);
+}
+
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.thumb.selected { border-color: var(--accent); }
+.thumb button.remove {
+  position: absolute; top: 2px; right: 2px;
+  padding: 2px 6px; font-size: 11px; line-height: 1;
+}
+
+.hint { font-size: 12px; color: var(--text-muted); }
+
+.empty { color: var(--text-muted); font-size: 13px; padding: 20px; text-align: center; }
+
+/* --- コード配置エディタ --- */
+.chord-editor {
+  font-family: "Courier New", monospace;
+  white-space: pre;
+  overflow-x: auto;
+  background: #111;
+  color: #eee;
+  padding: 30px 10px 10px;
+  border-radius: var(--radius);
+  position: relative;
+  line-height: 2.4;
+  font-size: 16px;
+  cursor: text;
+  user-select: text;
+}
+
+.chord-editor .lyric-line { position: relative; white-space: pre; }
+
+.chord-chip {
+  position: absolute;
+  top: -22px;
+  color: #ffd54a;
+  font-weight: bold;
+  font-size: 13px;
+  background: rgba(0,0,0,0.6);
+  padding: 0 3px;
+  border-radius: 4px;
+  cursor: grab;
+  user-select: none;
+}
+
+.chord-chip:hover { outline: 1px solid #ffd54a; }
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  z-index: 100;
+  opacity: 0.95;
+}

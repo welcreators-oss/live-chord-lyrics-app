@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>曲編集 - ライブコード歌詞アプリ</title>
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<main>
+  <div class="panel">
+    <div class="field">
+      <label>曲名</label>
+      <input type="text" id="song-title">
+    </div>
+    <div class="row">
+      <button class="primary" id="btn-save">保存</button>
+      <a class="btn" href="../index.html">曲一覧に戻る</a>
+      <span class="hint" id="save-status"></span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3 style="margin-top:0;">背景画像（この曲専用）</h3>
+    <p class="hint">未設定の場合は共通背景画像が使われます。</p>
+    <div class="thumb-grid" id="bg-thumbs"></div>
+    <div class="row" style="margin-top:10px;">
+      <input type="file" id="bg-file-input" accept="image/*" multiple>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="row" style="justify-content: space-between;">
+      <h3 style="margin:0;">ブロック（歌詞＋コード）</h3>
+      <button class="primary" id="btn-add-block">＋ブロック追加</button>
+    </div>
+    <p class="hint">ブロック単位で本番モードの送り（フットペダル）が切り替わります。コード名は歌詞プレビュー上をクリックして配置し、ドラッグで位置調整、クリックで削除できます。</p>
+  </div>
+
+  <div id="block-list"></div>
+</main>
+<script type="module" src="../js/pages/song-edit.js"></script>
+</body>
+</html>

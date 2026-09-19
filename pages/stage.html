@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>本番モード - ライブコード歌詞アプリ</title>
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="apple-touch-icon" href="../icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="stylesheet" href="../css/stage.css">
+</head>
+<body>
+<div id="stage-root">
+  <div id="stage-empty" class="stage-empty" hidden>
+    本番用セットリストが設定されていません。<br>
+    「セットリスト」画面で本番用セットリストを指定してください。
+  </div>
+
+  <img id="stage-bg" class="stage-bg" alt="">
+  <div class="stage-overlay-gradient"></div>
+  <div id="stage-blackout" class="stage-blackout" hidden></div>
+
+  <div id="stage-lyrics" class="stage-lyrics"></div>
+
+  <div class="stage-topbar">
+    <button id="btn-toggle-panel" class="stage-btn">曲一覧</button>
+    <div id="stage-status" class="stage-status"></div>
+    <div class="stage-topbar-right">
+      <button id="btn-blackout" class="stage-btn">黒画面</button>
+      <button id="btn-fullscreen" class="stage-btn">全画面</button>
+      <a href="../index.html" class="stage-btn">終了</a>
+    </div>
+  </div>
+
+  <div id="stage-nav-hint" class="stage-nav-hint">← 前へ / 次へ →（画面タップまたはフットペダル）</div>
+
+  <div id="song-panel" class="song-panel" hidden>
+    <h3>曲一覧</h3>
+    <div id="song-panel-list"></div>
+  </div>
+</div>
+<script type="module" src="../js/pages/stage.js"></script>
+</body>
+</html>

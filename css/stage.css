@@ -1,0 +1,138 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+
+#stage-root {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+}
+
+.stage-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+  padding: 20px;
+  line-height: 1.8;
+}
+
+.stage-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.stage-overlay-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.25) 40%, rgba(0,0,0,0.15) 100%);
+}
+
+.stage-blackout {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  z-index: 50;
+}
+
+.stage-lyrics {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6vh;
+  padding: 0 4vw;
+  color: #fff;
+  font-family: "Courier New", monospace;
+  font-size: 3.4vw;
+  line-height: 2.3;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.9);
+  z-index: 5;
+}
+
+.stage-lyrics .lyric-line {
+  position: relative;
+  white-space: pre;
+}
+
+.stage-lyrics .chord-chip {
+  position: absolute;
+  top: -1.15em;
+  color: #ffd54a;
+  font-weight: bold;
+}
+
+.stage-topbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  z-index: 20;
+  opacity: 0.35;
+  transition: opacity 0.2s;
+}
+.stage-topbar:hover, .stage-topbar:focus-within { opacity: 1; }
+
+.stage-topbar-right { display: flex; gap: 8px; }
+
+.stage-btn {
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.stage-btn:hover { background: rgba(255,255,255,0.2); }
+
+.stage-status {
+  color: #fff;
+  font-size: 13px;
+  background: rgba(0,0,0,0.5);
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.stage-nav-hint {
+  position: absolute;
+  top: 50px;
+  right: 14px;
+  color: rgba(255,255,255,0.4);
+  font-size: 11px;
+  z-index: 20;
+}
+
+.song-panel {
+  position: absolute;
+  top: 0; right: 0; bottom: 0;
+  width: min(320px, 80vw);
+  background: rgba(20,20,20,0.95);
+  color: #fff;
+  z-index: 30;
+  padding: 16px;
+  overflow-y: auto;
+}
+.song-panel h3 { margin-top: 40px; }
+.song-panel .panel-song-item {
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.song-panel .panel-song-item.current { background: #c0392b; }
+.song-panel .panel-song-item:hover { background: rgba(255,255,255,0.1); }
+
+@media (max-width: 700px) {
+  .stage-lyrics { font-size: 5vw; }
+}

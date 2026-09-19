@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>セットリスト - ライブコード歌詞アプリ</title>
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<main>
+  <div class="panel">
+    <div class="row">
+      <select id="setlist-select" style="max-width:260px;"></select>
+      <button id="btn-new-setlist">新規セットリスト</button>
+      <button class="danger" id="btn-delete-setlist">削除</button>
+    </div>
+  </div>
+
+  <div class="panel" id="setlist-detail" hidden>
+    <div class="field">
+      <label>セットリスト名</label>
+      <input type="text" id="setlist-name">
+    </div>
+    <div class="row">
+      <button class="primary" id="btn-set-current">本番で使うセットリストに設定</button>
+      <span class="hint" id="current-indicator"></span>
+    </div>
+  </div>
+
+  <div class="panel" id="setlist-songs-panel" hidden>
+    <h3 style="margin-top:0;">曲順</h3>
+    <div id="setlist-song-list"></div>
+  </div>
+
+  <div class="panel" id="add-song-panel" hidden>
+    <h3 style="margin-top:0;">曲を追加</h3>
+    <div id="all-song-list"></div>
+  </div>
+</main>
+<script type="module" src="../js/pages/setlist.js"></script>
+</body>
+</html>

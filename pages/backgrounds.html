@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>共通背景 - ライブコード歌詞アプリ</title>
+<link rel="icon" href="../icons/icon-192.png">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+<main>
+  <div class="panel">
+    <h3 style="margin-top:0;">共通背景画像</h3>
+    <p class="hint">曲別の背景画像が設定されていない曲は、ここに登録した画像が使われます。複数登録した場合は、本番モードでランダムまたは順番に切り替わります。</p>
+    <div class="field">
+      <label>切り替え方法</label>
+      <select id="bg-mode">
+        <option value="sequential">順番に切り替える</option>
+        <option value="random">ランダムに切り替える</option>
+      </select>
+    </div>
+    <div class="thumb-grid" id="bg-thumbs"></div>
+    <div class="row" style="margin-top:10px;">
+      <input type="file" id="bg-file-input" accept="image/*" multiple>
+    </div>
+  </div>
+</main>
+<script type="module" src="../js/pages/backgrounds.js"></script>
+</body>
+</html>
