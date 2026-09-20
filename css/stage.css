@@ -48,7 +48,11 @@ html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
   left: 0;
   right: 0;
   bottom: 6vh;
-  padding: 0 4vw;
+  /* コードは行の上（-1.15em）にはみ出して配置されるため、一番上の行のコードが
+     このコンテナ自体の外（画面の外）にクリップされないよう上に余白を確保する。
+     このpaddingはscrollHeightにも含まれるので、fitLyricsFontSizeの縮小判定にも
+     正しく反映される。 */
+  padding: 1.3em 4vw 0;
   color: #fff;
   font-family: "Courier New", monospace;
   font-size: 3.4vw;
