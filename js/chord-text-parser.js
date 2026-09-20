@@ -1,7 +1,7 @@
 // 「コード行＋歌詞行が交互に並ぶ」形式のテキスト（多くのコード譜サイトの表記と同じ）を
 // パースし、歌詞行とコード配置（行番号・文字位置）に変換する。OCRを介さずに、
 // 既存のテキストのコード譜をそのまま貼り付けて正確に取り込みたい場合に使う。
-const CHORD_TOKEN_RE = /^[A-G](#|##|b|bb)?(maj|min|dim|aug|sus2|sus4|sus|add|m|M)?[0-9]*([+-]5)?(\/[A-G](#|b)?)?$/;
+const CHORD_TOKEN_RE = /^[A-G](#|##|b|bb)?(maj|min|dim|aug|sus2|sus4|sus|add|m|M)*[0-9]*([+-]5)?(\/[A-G](#|b)?)?$/;
 
 function isChordToken(token) {
   return CHORD_TOKEN_RE.test(token);
