@@ -13,6 +13,17 @@ function getCtxForElement(el) {
   return ctx;
 }
 
+// colが歌詞の文字数を超える場合（歌詞が短くコードの広がりに足りないケース）は、
+// 超過分を半角スペース1文字分の幅として延長する（chord-editor.jsと同じ考え方）。
+function widthUpToCol(ctx, lineText, col) {
+  if (col <= lineText.length) {
+    return ctx.measureText(lineText.slice(0, col)).width;
+  }
+  const baseWidth = ctx.measureText(lineText).width;
+  const extraWidth = (col - lineText.length) * ctx.measureText(' ').width;
+  return baseWidth + extraWidth;
+}
+
 export function renderStageBlock(container, block) {
   container.innerHTML = '';
   if (!block) return;
@@ -28,7 +39,7 @@ export function renderStageBlock(container, block) {
         const chip = document.createElement('span');
         chip.className = 'chord-chip';
         chip.textContent = chord.text;
-        chip.style.left = `${ctx.measureText(lineText.slice(0, chord.col)).width}px`;
+        chip.style.left = `${widthUpToCol(ctx, lineText, chord.col)}px`;
         lineEl.appendChild(chip);
       });
     container.appendChild(lineEl);

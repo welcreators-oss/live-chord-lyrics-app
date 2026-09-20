@@ -41,6 +41,11 @@ function isFullWidthChar(ch) {
   );
 }
 
+// 戻り値は「歌詞文字列中の位置」だが、コードの広がりに対して歌詞が短すぎる場合
+// （例: 8個のコードに対して歌詞が「（間奏）」の4文字だけ、等）は歌詞の文字数を
+// 超える値を返すことがある。歌詞の右側に半角スペース換算で続きがあるとみなして
+// はみ出させることで、コード同士が同じ位置に重なるのを避ける
+// （表示側のwidthUpToColも歌詞の文字数超過に対応させてセットで機能する）。
 function halfWidthUnitsToLyricIndex(lyricText, units) {
   let acc = 0;
   for (let idx = 0; idx < lyricText.length; idx += 1) {
@@ -48,7 +53,8 @@ function halfWidthUnitsToLyricIndex(lyricText, units) {
     if (acc + w / 2 > units) return idx;
     acc += w;
   }
-  return lyricText.length;
+  const remainingHalfWidthUnits = Math.max(0, units - acc);
+  return lyricText.length + remainingHalfWidthUnits;
 }
 
 export function containsChordLine(text) {
@@ -79,7 +85,11 @@ export function parseChordSheetText(text) {
       const lyricLineIndex = lyricLines.length;
       const nextLine = rawLines[i + 1];
       const hasLyric = nextLine !== undefined && !isChordLine(nextLine);
-      const lyricText = hasLyric ? nextLine : '';
+      // 歌詞の無い行（コードだけの間奏・アウトロ等）は、歌詞テキストが空文字列だと
+      // 位置計算の基準そのものが無くなり全コードが同じ位置（左端）に重なってしまう。
+      // 元のコード行と同じ長さの半角スペース文字列を「歌詞」として持たせることで、
+      // 元のテキスト通りの間隔でコードだけが並んだ表示になる（見た目には空行のまま）。
+      const lyricText = hasLyric ? nextLine : ' '.repeat(line.length);
 
       extractTokenPositions(line).forEach(({ col, text: chordText }) => {
         const mappedCol = hasLyric ? halfWidthUnitsToLyricIndex(lyricText, col) : col;

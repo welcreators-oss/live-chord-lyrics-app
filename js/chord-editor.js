@@ -14,12 +14,21 @@ function getMeasureCtx() {
   return measureCtx;
 }
 
-// 行頭からcol文字目までの実際の表示幅(px)
+// 行頭からcol文字目までの実際の表示幅(px)。
+// col が歌詞の文字数を超える場合（コード譜テキスト取り込み時、歌詞が短くコードの
+// 広がりに足りないケースがある）は、超過分を半角スペース1文字分の幅として延長する。
 function widthUpToCol(lineText, col) {
-  return getMeasureCtx().measureText(lineText.slice(0, col)).width;
+  const ctx = getMeasureCtx();
+  if (col <= lineText.length) {
+    return ctx.measureText(lineText.slice(0, col)).width;
+  }
+  const baseWidth = ctx.measureText(lineText).width;
+  const extraWidth = (col - lineText.length) * ctx.measureText(' ').width;
+  return baseWidth + extraWidth;
 }
 
-// クリック/ドロップされたx座標(px)に最も近い文字位置(col)を返す
+// クリック/ドロップされたx座標(px)に最も近い文字位置(col)を返す。
+// 歌詞の右端より右をクリック/ドラッグした場合は、半角スペース換算で文字数を超えて延長する。
 function colFromOffsetX(lineText, offsetX) {
   const ctx = getMeasureCtx();
   let acc = 0;
@@ -28,7 +37,9 @@ function colFromOffsetX(lineText, offsetX) {
     if (acc + w / 2 > offsetX) return i;
     acc += w;
   }
-  return lineText.length;
+  if (offsetX <= acc) return lineText.length;
+  const spaceWidth = ctx.measureText(' ').width;
+  return lineText.length + Math.round((offsetX - acc) / spaceWidth);
 }
 
 const DRAG_THRESHOLD_PX = 4;
