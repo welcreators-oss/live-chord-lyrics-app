@@ -74,11 +74,33 @@ async function pickBackgroundUrl(song) {
   return getImageUrl(img.id);
 }
 
+// 歌詞ブロックの行数が多いと、下揃えレイアウトのため上の方の行（とそのコード）が
+// 画面の外にはみ出して見えなくなることがある。実際の描画結果の高さを測って、
+// 画面に収まるまでフォントサイズを段階的に縮小する（コード位置の計算もフォント
+// サイズに依存するため、縮小のたびに再描画が必要）。
+const DEFAULT_LYRICS_FONT_VW = 3.4;
+const MIN_LYRICS_FONT_VW = 1.6;
+
+function fitLyricsFontSize(block) {
+  let fontVw = DEFAULT_LYRICS_FONT_VW;
+  els.lyrics.style.fontSize = `${fontVw}vw`;
+  renderStageBlock(els.lyrics, block);
+
+  const maxHeight = window.innerHeight * 0.82;
+  let guard = 0;
+  while (els.lyrics.scrollHeight > maxHeight && fontVw > MIN_LYRICS_FONT_VW && guard < 20) {
+    fontVw = Math.max(MIN_LYRICS_FONT_VW, fontVw - 0.15);
+    els.lyrics.style.fontSize = `${fontVw}vw`;
+    renderStageBlock(els.lyrics, block);
+    guard += 1;
+  }
+}
+
 async function updateDisplay({ resetBackground = false } = {}) {
   const song = songs[songIndex];
   if (!song) return;
   const block = song.blocks[blockIndex];
-  renderStageBlock(els.lyrics, block);
+  fitLyricsFontSize(block);
   els.status.textContent = `${song.title}（${songIndex + 1}/${songs.length}） ブロック ${blockIndex + 1}/${song.blocks.length}`;
 
   if (resetBackground || currentBgKeyForSong !== song.id) {
@@ -178,7 +200,7 @@ attachPedalListener({ onPrev: goPrev, onNext: goNext });
 
 window.addEventListener('resize', () => {
   const song = songs[songIndex];
-  if (song) renderStageBlock(els.lyrics, song.blocks[blockIndex]);
+  if (song) fitLyricsFontSize(song.blocks[blockIndex]);
 });
 
 async function init() {
