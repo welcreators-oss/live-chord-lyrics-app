@@ -1,11 +1,11 @@
 * { box-sizing: border-box; }
-html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+html, body { margin: 0; height: 100%; background: #0a1a33; overflow: hidden; }
 [hidden] { display: none !important; }
 
 #stage-root {
   position: fixed;
   inset: 0;
-  background: #000;
+  background: #0a1a33;
   font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
 }
 
