@@ -33,9 +33,12 @@
   <div class="panel">
     <div class="row" style="justify-content: space-between;">
       <h3 style="margin:0;">ブロック（歌詞＋コード）</h3>
-      <button class="primary" id="btn-add-block">＋ブロック追加</button>
+      <div class="row">
+        <button id="btn-auto-merge">4行以上になるよう自動でまとめる</button>
+        <button class="primary" id="btn-add-block">＋ブロック追加</button>
+      </div>
     </div>
-    <p class="hint">ブロック単位で本番モードの送り（フットペダル）が切り替わります。コード名は歌詞プレビュー上をクリックして配置し、ドラッグで位置調整、クリックで削除できます。</p>
+    <p class="hint">ブロック単位で本番モードの送り（フットペダル）が切り替わります。コード名は歌詞プレビュー上をクリックして配置し、ドラッグで位置調整、クリックで削除できます。細かく分かれすぎている場合は「次と結合」や「自動でまとめる」で見やすい粒度に調整できます。</p>
   </div>
 
   <div id="block-list"></div>

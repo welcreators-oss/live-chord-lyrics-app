@@ -118,6 +118,7 @@ function renderBlocks() {
         <div class="row">
           <button data-action="up" ${index === 0 ? 'disabled' : ''}>↑</button>
           <button data-action="down" ${index === song.blocks.length - 1 ? 'disabled' : ''}>↓</button>
+          <button data-action="merge-next" ${index === song.blocks.length - 1 ? 'disabled' : ''}>次と結合</button>
           <button data-action="duplicate">複製</button>
           <button class="danger" data-action="delete" ${song.blocks.length <= 1 ? 'disabled' : ''}>削除</button>
         </div>
@@ -153,6 +154,7 @@ function renderBlocks() {
 
     panel.querySelector('[data-action="up"]').addEventListener('click', () => moveBlock(index, -1));
     panel.querySelector('[data-action="down"]').addEventListener('click', () => moveBlock(index, 1));
+    panel.querySelector('[data-action="merge-next"]').addEventListener('click', () => mergeWithNextBlock(index));
     panel.querySelector('[data-action="duplicate"]').addEventListener('click', () => duplicateBlock(index));
     panel.querySelector('[data-action="delete"]').addEventListener('click', () => removeBlock(index));
 
@@ -213,6 +215,23 @@ function moveBlock(index, dir) {
   scheduleSave();
 }
 
+function mergeWithNextBlock(index) {
+  if (index >= song.blocks.length - 1) return;
+  const current = song.blocks[index];
+  const next = song.blocks[index + 1];
+  // 結合の目印として元のセクション境界に空行を1行挟んでおく（見た目の区切りを残すため）
+  const offset = current.lyricLines.length + 1;
+
+  current.lyricLines = [...current.lyricLines, '', ...next.lyricLines];
+  current.chords = [
+    ...current.chords,
+    ...next.chords.map((c) => ({ ...c, line: c.line + offset })),
+  ];
+  song.blocks.splice(index + 1, 1);
+  renderBlocks();
+  scheduleSave();
+}
+
 function duplicateBlock(index) {
   const original = song.blocks[index];
   const copy = JSON.parse(JSON.stringify(original));
@@ -234,6 +253,42 @@ document.getElementById('btn-add-block').addEventListener('click', () => {
   song.blocks.push(newBlock());
   renderBlocks();
   scheduleSave();
+});
+
+// OCR結果や曲まるごとのテキストの自動分割で、1〜2行程度の細かいブロックが
+// 大量にできて本番モードの送りが見づらくなることがある。行数の少ないブロックを
+// 順に次のブロックと結合し、最低行数に達するまでまとめる（歌詞の区切りが分かる
+// よう、mergeWithNextBlockと同様に結合部分には空行を挟む）。
+const AUTO_MERGE_MIN_LINES = 4;
+document.getElementById('btn-auto-merge').addEventListener('click', () => {
+  if (song.blocks.length <= 1) return;
+  if (!confirmDialog(`歌詞が${AUTO_MERGE_MIN_LINES}行に満たないブロックを、次のブロックと自動的にまとめます。よろしいですか？`)) return;
+
+  const merged = [];
+  let current = null;
+  for (const block of song.blocks) {
+    if (!current) {
+      current = block;
+      continue;
+    }
+    if (current.lyricLines.length < AUTO_MERGE_MIN_LINES) {
+      const offset = current.lyricLines.length + 1;
+      current.lyricLines = [...current.lyricLines, '', ...block.lyricLines];
+      current.chords = [
+        ...current.chords,
+        ...block.chords.map((c) => ({ ...c, line: c.line + offset })),
+      ];
+    } else {
+      merged.push(current);
+      current = block;
+    }
+  }
+  if (current) merged.push(current);
+
+  song.blocks = merged;
+  renderBlocks();
+  scheduleSave();
+  toast(`${merged.length}個のブロックにまとまりました`);
 });
 
 await renderBgThumbs();
