@@ -1,7 +1,7 @@
 // 「コード行＋歌詞行が交互に並ぶ」形式のテキスト（多くのコード譜サイトの表記と同じ）を
 // パースし、歌詞行とコード配置（行番号・文字位置）に変換する。OCRを介さずに、
 // 既存のテキストのコード譜をそのまま貼り付けて正確に取り込みたい場合に使う。
-const CHORD_TOKEN_RE = /^[A-G](#|##|b|bb)?(maj|min|dim|aug|sus2|sus4|sus|add|m)?[0-9]*(\/[A-G](#|b)?)?$/;
+const CHORD_TOKEN_RE = /^[A-G](#|##|b|bb)?(maj|min|dim|aug|sus2|sus4|sus|add|m|M)?[0-9]*(\/[A-G](#|b)?)?$/;
 
 function isChordToken(token) {
   return CHORD_TOKEN_RE.test(token);
@@ -28,6 +28,16 @@ function extractTokenPositions(line) {
 export function containsChordLine(text) {
   const lines = text.replace(/\r\n/g, '\n').split('\n');
   return lines.some(isChordLine);
+}
+
+// 空行（1行以上の空白行）をAメロ／Bメロ／サビ等のセクション区切りとみなして分割する。
+// OCR結果やコード譜テキストをまとめて貼り付けたときに、ブロックへ自動分割するために使う。
+export function splitIntoSections(text) {
+  return text
+    .replace(/\r\n/g, '\n')
+    .split(/\n[ \t　]*\n+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
 }
 
 // 戻り値: { lyricLines: string[], chords: {line, col, text}[] }
