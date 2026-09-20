@@ -25,6 +25,32 @@ function extractTokenPositions(line) {
   return result;
 }
 
+// コード譜テキストの位置合わせは、コード行が半角スペースで字下げされる一方、
+// 歌詞行は全角文字が中心なので、単純な文字インデックスのままでは大きくずれる
+// （全角文字は表示幅が半角の約2倍のため）。ここではコード行側は全て半角文字と
+// みなして「col=半角換算の幅」として扱い、歌詞側も同様に全角=2・半角=1で
+// 換算した表示幅を積み上げて対応する文字位置を探す。
+function isFullWidthChar(ch) {
+  const code = ch.codePointAt(0);
+  return (
+    (code >= 0x3000 && code <= 0x303f) || // CJK記号・句読点
+    (code >= 0x3040 && code <= 0x30ff) || // ひらがな・カタカナ
+    (code >= 0x3400 && code <= 0x4dbf) || // CJK拡張A
+    (code >= 0x4e00 && code <= 0x9fff) || // CJK統合漢字
+    (code >= 0xff00 && code <= 0xffef)    // 全角英数字・記号
+  );
+}
+
+function halfWidthUnitsToLyricIndex(lyricText, units) {
+  let acc = 0;
+  for (let idx = 0; idx < lyricText.length; idx += 1) {
+    const w = isFullWidthChar(lyricText[idx]) ? 2 : 1;
+    if (acc + w / 2 > units) return idx;
+    acc += w;
+  }
+  return lyricText.length;
+}
+
 export function containsChordLine(text) {
   const lines = text.replace(/\r\n/g, '\n').split('\n');
   return lines.some(isChordLine);
@@ -51,18 +77,17 @@ export function parseChordSheetText(text) {
     const line = rawLines[i];
     if (isChordLine(line)) {
       const lyricLineIndex = lyricLines.length;
-      extractTokenPositions(line).forEach(({ col, text: chordText }) => {
-        chords.push({ line: lyricLineIndex, col, text: chordText });
-      });
       const nextLine = rawLines[i + 1];
-      if (nextLine !== undefined && !isChordLine(nextLine)) {
-        lyricLines.push(nextLine);
-        i += 2;
-      } else {
-        // 次の行も無い／コード行が連続する場合は空の歌詞行を挿んでコード位置を保持
-        lyricLines.push('');
-        i += 1;
-      }
+      const hasLyric = nextLine !== undefined && !isChordLine(nextLine);
+      const lyricText = hasLyric ? nextLine : '';
+
+      extractTokenPositions(line).forEach(({ col, text: chordText }) => {
+        const mappedCol = hasLyric ? halfWidthUnitsToLyricIndex(lyricText, col) : col;
+        chords.push({ line: lyricLineIndex, col: mappedCol, text: chordText });
+      });
+
+      lyricLines.push(lyricText);
+      i += hasLyric ? 2 : 1;
     } else {
       lyricLines.push(line);
       i += 1;
