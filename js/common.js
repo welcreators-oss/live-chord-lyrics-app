@@ -50,6 +50,13 @@ export function disableAutoReloadOnUpdate() {
 }
 
 if ('serviceWorker' in navigator) {
+  // 初回訪問（まだこのページを制御するSWが無い状態からの初インストール）でも
+  // controllerchangeは発火するが、これはリロード不要。「既にcontrollerがある状態から
+  // 別のSWへ切り替わった」ときだけリロードする。ここを間違えると初回アクセス時に
+  // 勝手にリロードが走り、その裏でユーザーの操作（クリック等）が失われる事故になる
+  // （実際に発生し修正した）。controllerchangeのたびに直前の状態と比較する。
+  let hadController = !!navigator.serviceWorker.controller;
+
   window.addEventListener('load', () => {
     navigator.serviceWorker.register(resolveRootPath('sw.js')).then((reg) => {
       reg.update().catch(() => {});
@@ -58,7 +65,9 @@ if ('serviceWorker' in navigator) {
 
   let reloaded = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (reloaded || !autoReloadOnUpdate) return;
+    const shouldReload = hadController && autoReloadOnUpdate && !reloaded;
+    hadController = true;
+    if (!shouldReload) return;
     reloaded = true;
     location.reload();
   });
