@@ -92,13 +92,16 @@ selectEl.addEventListener('change', () => {
   renderDetail();
 });
 
-document.getElementById('btn-new-setlist').addEventListener('click', async () => {
+document.getElementById('btn-new-setlist').addEventListener('click', () => {
   const setlist = { id: uuid(), name: `セットリスト${setlists.length + 1}`, songIds: [], order: Date.now() };
-  await put('setlists', setlist);
   setlists.push(setlist);
   currentId = setlist.id;
   renderSelect();
   renderDetail();
+  put('setlists', setlist).catch((e) => {
+    console.error(e);
+    toast('セットリストの保存に失敗しました: ' + (e && e.message));
+  });
 });
 
 document.getElementById('btn-delete-setlist').addEventListener('click', async () => {
