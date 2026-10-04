@@ -47,11 +47,11 @@ html, body { margin: 0; height: 100%; background: #0a1a33; overflow: hidden; }
   position: absolute;
   left: 0;
   right: 0;
-  top: 0;
-  bottom: 0;
+  top: 12vh;
+  bottom: 6vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   /* コードは行の上（-1.15em）にはみ出して配置されるため、一番上の行のコードが
      このコンテナ自体の外（画面の外）にクリップされないよう上に余白を確保する。
      このpaddingはscrollHeightにも含まれるので、fitLyricsFontSizeの縮小判定にも
