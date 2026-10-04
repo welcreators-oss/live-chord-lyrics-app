@@ -78,7 +78,7 @@ async function pickBackgroundUrl(song) {
 // 画面の外にはみ出して見えなくなることがある。実際の描画結果の高さを測って、
 // 画面に収まるまでフォントサイズを段階的に縮小する（コード位置の計算もフォント
 // サイズに依存するため、縮小のたびに再描画が必要）。
-const DEFAULT_LYRICS_FONT_VW = 3.4;
+const DEFAULT_LYRICS_FONT_VW = 6;
 const MIN_LYRICS_FONT_VW = 1.6;
 
 function fitLyricsFontSize(block) {
@@ -87,8 +87,13 @@ function fitLyricsFontSize(block) {
   renderStageBlock(els.lyrics, block);
 
   const maxHeight = window.innerHeight * 0.82;
+  const maxWidth = els.lyrics.clientWidth;
   let guard = 0;
-  while (els.lyrics.scrollHeight > maxHeight && fontVw > MIN_LYRICS_FONT_VW && guard < 20) {
+  while (
+    (els.lyrics.scrollHeight > maxHeight || els.lyrics.scrollWidth > maxWidth) &&
+    fontVw > MIN_LYRICS_FONT_VW &&
+    guard < 40
+  ) {
     fontVw = Math.max(MIN_LYRICS_FONT_VW, fontVw - 0.15);
     els.lyrics.style.fontSize = `${fontVw}vw`;
     renderStageBlock(els.lyrics, block);
