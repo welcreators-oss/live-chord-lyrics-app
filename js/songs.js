@@ -1,5 +1,5 @@
 // 曲データのCRUDとデータ構造ヘルパー
-import { get, put, remove, getAll, uuid } from './db.js';
+import { put, remove, getAll, uuid } from './db.js';
 
 // Song: { id, title, order, backgroundImageIds:[id], blocks:[Block], updatedAt }
 // Block: { id, lyricLines:[string], chords:[{line, col, text}] }
