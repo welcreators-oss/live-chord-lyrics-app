@@ -25,7 +25,8 @@ export async function listSongs() {
 }
 
 export async function getSong(id) {
-  return get('songs', id);
+  const songs = await getAll('songs');
+  return songs.find((s) => s.id === id);
 }
 
 export async function saveSong(song) {
