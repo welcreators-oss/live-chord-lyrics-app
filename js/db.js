@@ -1,8 +1,18 @@
-// IndexedDBラッパー。全データは端末内にのみ保存し、外部送信は一切行わない。
+// データ保存層。
+// - 曲(songs)・セットリスト(setlists): Firebase設定時はFirestoreに保存し、PC/iPad間で共有する。
+//   Firebase未設定（firebase-config.js の FIREBASE_CONFIG が null）の間は端末内のIndexedDBに保存する。
+// - 画像(images)・設定(settings): 端末ごとのもので、従来どおり端末内のIndexedDBにのみ保存する。
+// 外部送信はFirestoreへの曲・セットリストの同期に限られ、画像は一切送信しない。
+import { FIREBASE_CONFIG } from './firebase-config.js';
+
 const DB_NAME = 'live-chord-app-db';
 const DB_VERSION = 1;
+const SYNCED_STORES = ['songs', 'setlists'];
+const syncEnabled = !!FIREBASE_CONFIG;
 
 let dbPromise = null;
+let syncPromise = null;
+let migrationPromise = null;
 
 function openDB() {
   if (dbPromise) return dbPromise;
@@ -40,6 +50,55 @@ function wrapReq(req) {
   });
 }
 
+async function localGetAll(storeName) {
+  const store = await tx(storeName, 'readonly');
+  return wrapReq(store.getAll());
+}
+
+async function localGet(storeName, id) {
+  const store = await tx(storeName, 'readonly');
+  return wrapReq(store.get(id));
+}
+
+async function localPut(storeName, value) {
+  const store = await tx(storeName, 'readwrite');
+  await wrapReq(store.put(value));
+  return value;
+}
+
+async function localRemove(storeName, id) {
+  const store = await tx(storeName, 'readwrite');
+  return wrapReq(store.delete(id));
+}
+
+function loadSync() {
+  if (!syncPromise) syncPromise = import('./sync.js');
+  return syncPromise;
+}
+
+const usesCloud = (storeName) => syncEnabled && SYNCED_STORES.includes(storeName);
+
+// 初回のみ、端末内に既にある曲・セットリストをクラウドへ移す（既存データの取り込み漏れ防止）
+function ensureMigrated() {
+  if (!migrationPromise) migrationPromise = migrateLocalToCloud();
+  return migrationPromise;
+}
+
+async function migrateLocalToCloud() {
+  const flag = await localGet('settings', 'cloudMigrated');
+  if (flag && flag.value) return;
+  const sync = await loadSync();
+  for (const name of SYNCED_STORES) {
+    const local = await localGetAll(name);
+    const remote = await sync.syncGetAll(name);
+    const remoteIds = new Set(remote.map((r) => r.id));
+    for (const item of local) {
+      if (!remoteIds.has(item.id)) sync.syncPut(name, item);
+    }
+  }
+  await localPut('settings', { key: 'cloudMigrated', value: true });
+}
+
 export function uuid() {
   return (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0;
@@ -49,37 +108,48 @@ export function uuid() {
 }
 
 export async function getAll(storeName) {
-  const store = await tx(storeName, 'readonly');
-  return wrapReq(store.getAll());
+  if (!usesCloud(storeName)) return localGetAll(storeName);
+  await ensureMigrated();
+  const sync = await loadSync();
+  return sync.syncGetAll(storeName);
 }
 
 export async function get(storeName, id) {
-  const store = await tx(storeName, 'readonly');
-  return wrapReq(store.get(id));
+  if (!usesCloud(storeName)) return localGet(storeName, id);
+  await ensureMigrated();
+  const sync = await loadSync();
+  return sync.syncGet(storeName, id);
 }
 
 export async function put(storeName, value) {
-  const store = await tx(storeName, 'readwrite');
-  await wrapReq(store.put(value));
-  return value;
+  if (!usesCloud(storeName)) return localPut(storeName, value);
+  await ensureMigrated();
+  const sync = await loadSync();
+  return sync.syncPut(storeName, value);
 }
 
 export async function remove(storeName, id) {
-  const store = await tx(storeName, 'readwrite');
-  return wrapReq(store.delete(id));
+  if (!usesCloud(storeName)) return localRemove(storeName, id);
+  await ensureMigrated();
+  const sync = await loadSync();
+  return sync.syncRemove(storeName, id);
 }
 
 export async function getSetting(key, defaultValue = null) {
-  const row = await get('settings', key);
+  const row = await localGet('settings', key);
   return row ? row.value : defaultValue;
 }
 
 export async function setSetting(key, value) {
-  return put('settings', { key, value });
+  return localPut('settings', { key, value });
 }
 
 export async function clearAll() {
   const db = await openDB();
   const names = ['songs', 'images', 'setlists', 'settings'];
   await Promise.all(names.map((name) => wrapReq(db.transaction(name, 'readwrite').objectStore(name).clear())));
+  if (syncEnabled) {
+    const sync = await loadSync();
+    for (const name of SYNCED_STORES) await sync.syncClearAll(name);
+  }
 }

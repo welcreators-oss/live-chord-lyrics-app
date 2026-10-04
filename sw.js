@@ -1,6 +1,6 @@
 // オフラインキャッシュ用Service Worker。
 // 更新時はCACHE_NAMEのバージョンを上げること（古いキャッシュは自動破棄される）。
-const CACHE_NAME = 'live-chord-cache-v14';
+const CACHE_NAME = 'live-chord-cache-v15';
 
 const PRECACHE_URLS = [
   './',
@@ -10,6 +10,11 @@ const PRECACHE_URLS = [
   './css/stage.css',
   './js/common.js',
   './js/db.js',
+  './js/firebase-config.js',
+  './js/sync.js',
+  './vendor/firebase/firebase-app.js',
+  './vendor/firebase/firebase-auth.js',
+  './vendor/firebase/firebase-firestore.js',
   './js/images.js',
   './js/songs.js',
   './js/ocr.js',

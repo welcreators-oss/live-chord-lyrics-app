@@ -99,3 +99,30 @@ python -m http.server 8000
 - iPad SafariでのPWA表示・プロジェクターミラーリング時の見え方
 - 実際のコード譜画像を使ったOCR精度（画像の解像度・手書き／印刷等により精度が変わります）
 - 長時間のオフライン安定性
+
+## PC・iPadの自動同期（Firebase）の設定
+
+曲とセットリストは、Firebase（Googleの無料クラウド）に保存すると、同じ設定のPC・iPad間で自動的に共有されます。画像と設定は従来どおり各端末内に保存されます。Firebaseを設定するまでは、従来どおり端末内だけに保存されます。
+
+1. https://console.firebase.google.com でプロジェクトを作成する（Googleアカウントでログイン）。
+2. 「Firestore Database」→「データベースを作成」（本番モード、リージョンは asia-northeast1 を推奨）。
+3. 「Authentication」→「始める」→「ログイン方法」で「匿名」を有効にする。
+4. Firestoreの「ルール」タブに次を貼り付けて「公開」する。
+   ```
+   rules_version = '2';
+   service cloud.firestore {
+     match /databases/{database}/documents {
+       match /workspaces/{workspaceId}/{document=**} {
+         allow read, write: if request.auth != null;
+       }
+     }
+   }
+   ```
+5. プロジェクトの設定（歯車）→「マイアプリ」→「ウェブアプリを追加」で表示される `firebaseConfig` の値を、`js/firebase-config.js` の `FIREBASE_CONFIG` に入れる（`null` を書き換える）。
+6. `sw.js` の `CACHE_NAME` の版数を1つ上げてからコミット・プッシュする（iPadが新しい版を読み込むため）。
+
+注意: 同じ `WORKSPACE_ID` を知っていれば誰でもデータを読み書きできる仕組みです（本物のアクセス制御ではありません）。歌詞・コードのみを扱う前提の運用です。
+
+### iPadでの使い方
+- iPadのSafariで公開URLを開き、「ホーム画面に追加」しておく。
+- 本番前に、必ず一度Wi-Fiかテザリングの接続がある状態でアプリを開き、曲が表示されることを確認する（オフラインでの読み込みは、一度オンラインで開いた後のみ可能です）。
